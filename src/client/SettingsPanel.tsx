@@ -99,13 +99,13 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
         <span className={css.imgname}>{names.main ?? (settings.wallpaper === null ? t('none') : t('set'))}</span>
         <button className={css.smallbtn} onClick={() => pickFile(
           'image/*',
-          (d) => update({ wallpaper: d }),
-          (n) => setNames((p) => ({ ...p, main: n })),
+          d => update({ wallpaper: d }),
+          n => setNames(p => ({ ...p, main: n })),
         )}>
           {t('choose')}
         </button>
         <button className={css.smallbtn} onClick={() => {
-          setNames((p) => ({ ...p, main: null }))
+          setNames(p => ({ ...p, main: null }))
           update({ wallpaper: null })
         }}>
           {t('clear')}
@@ -131,13 +131,13 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
           <span className={css.imgname}>{names.sidebar ?? t('set')}</span>
           <button className={css.smallbtn} onClick={() => pickFile(
             'image/*',
-            (d) => update({ sidebarWallpaper: d }),
-            (n) => setNames((p) => ({ ...p, sidebar: n })),
+            d => update({ sidebarWallpaper: d }),
+            n => setNames(p => ({ ...p, sidebar: n })),
           )}>
             {t('choose')}
           </button>
           <button className={css.smallbtn} onClick={() => {
-            setNames((p) => ({ ...p, sidebar: null }))
+            setNames(p => ({ ...p, sidebar: null }))
             update({ sidebarWallpaper: null })
           }}>
             {t('clear')}
@@ -149,7 +149,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('blur')}</span>
         <input type="range" min={0} max={64} step={1} value={settings.wallpaperBlur}
-          onChange={(e) => update({ wallpaperBlur: Number(e.target.value) })} />
+          onChange={e => update({ wallpaperBlur: Number(e.target.value) })} />
         <span className={css.val}>{settings.wallpaperBlur}px</span>
       </div>
       <div className={css.desc}>{t('blurDesc')}</div>
@@ -157,7 +157,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('glassBlur')}</span>
         <input type="range" min={0} max={64} step={1} value={settings.glassBlur}
-          onChange={(e) => update({ glassBlur: Number(e.target.value) })} />
+          onChange={e => update({ glassBlur: Number(e.target.value) })} />
         <span className={css.val}>{settings.glassBlur}px</span>
       </div>
       <div className={css.desc}>{t('glassBlurDesc')}</div>
@@ -165,7 +165,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('panelAlpha')}</span>
         <input type="range" min={0} max={90} step={1} value={Math.round(settings.panelAlpha * 100)}
-          onChange={(e) => update({ panelAlpha: Number(e.target.value) / 100 })} />
+          onChange={e => update({ panelAlpha: Number(e.target.value) / 100 })} />
         <span className={css.val}>{Math.round(settings.panelAlpha * 100)}%</span>
       </div>
       <div className={css.desc}>{t('panelAlphaDesc')}</div>
@@ -173,7 +173,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('codeAlpha')}</span>
         <input type="range" min={8} max={100} step={1} value={Math.round(settings.codeAlpha * 100)}
-          onChange={(e) => update({ codeAlpha: Number(e.target.value) / 100 })} />
+          onChange={e => update({ codeAlpha: Number(e.target.value) / 100 })} />
         <span className={css.val}>{Math.round(settings.codeAlpha * 100)}%</span>
       </div>
       <div className={css.desc}>{t('codeAlphaDesc')}</div>
@@ -181,10 +181,10 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('transparent')}</span>
         <div className={css.checks}>
-          {(['newSession', 'input', 'sidebar', 'main'] as const).map((key) => (
+          {(['newSession', 'input', 'sidebar', 'main'] as const).map(key => (
             <label key={key} className={css.check}>
               <input type="checkbox" checked={settings.transparent[key]}
-                onChange={(e) => updateTransparent(key, e.target.checked)} />
+                onChange={e => updateTransparent(key, e.target.checked)} />
               <span>{t(`transparent.${key}`)}</span>
             </label>
           ))}
@@ -194,7 +194,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('splashMode')}</span>
         <div className={css.seg}>
-          {(['default', 'follow', 'custom'] as const).map((mode) => (
+          {(['default', 'follow', 'custom'] as const).map(mode => (
             <button key={mode} className={cls(settings.splashMode === mode)}
               onClick={() => update({ splashMode: mode })}>
               {t(`splashMode.${mode}`)}
@@ -208,13 +208,13 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
           <span className={css.imgname}>{names.splash ?? (settings.splashFile === null ? t('none') : t('set'))}</span>
           <button className={css.smallbtn} onClick={() => pickFile(
             'image/*',
-            (d) => update({ splashFile: d }),
-            (n) => setNames((p) => ({ ...p, splash: n })),
+            d => update({ splashFile: d }),
+            n => setNames(p => ({ ...p, splash: n })),
           )}>
             {t('pick')}
           </button>
           <button className={css.smallbtn} onClick={() => {
-            setNames((p) => ({ ...p, splash: null }))
+            setNames(p => ({ ...p, splash: null }))
             update({ splashFile: null })
           }}>
             {t('clear')}
@@ -225,7 +225,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('duration')}</span>
         <input type="range" min={0} max={10} step={0.5} value={settings.splashDuration}
-          onChange={(e) => update({ splashDuration: Number(e.target.value) })} />
+          onChange={e => update({ splashDuration: Number(e.target.value) })} />
         <span className={css.val}>{settings.splashDuration === 0 ? t('durationZero') : `${settings.splashDuration} 秒`}</span>
       </div>
       <div className={css.desc}>{t('durationDesc')}</div>
@@ -233,7 +233,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.row}>
         <span className={css.label}>{t('fade')}</span>
         <input type="range" min={0} max={2} step={0.1} value={settings.splashFade}
-          onChange={(e) => update({ splashFade: Number(e.target.value) })} />
+          onChange={e => update({ splashFade: Number(e.target.value) })} />
         <span className={css.val}>{settings.splashFade === 0 ? t('fadeZero') : `${settings.splashFade} 秒`}</span>
       </div>
       <div className={css.desc}>{t('fadeDesc')}</div>

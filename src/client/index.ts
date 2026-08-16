@@ -26,7 +26,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
   }
 }
 
-export type { InterfaceSettings, InterfaceSettingsKey } from './settings.ts'
+export type { InterfaceSettings } from './settings.ts'
 
 /** Required services for locale registration and the settings section. */
 export const inject = ['slots', 'locale']
