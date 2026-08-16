@@ -1,4 +1,5 @@
 node_modules/
+dist/
 *.log
 # 构建中间产物不进库（lib/client.js 与 lib/index.js、lib/types/*.d.ts 进库，供免 npm 拷贝安装）
 lib/tsconfig.tsbuildinfo

@@ -170,6 +170,10 @@ DSH 仓库 checkout（deepseek-ai/deepseek-harness）
 # 3) 重启 dsh web（或重启桌面端应用；改 patch 也会热重载）
 ```
 
+> 也可直接下载 [Release 包](https://github.com/Qiongkura/dsh-interface-settings/releases/latest)
+> （`dsh-interface-settings-0.1.0.tgz`），解压后按上面 1) 拷贝
+> `package/` 目录内容即可，同样无需 npm。
+
 > ⚠️ 注意：**不要**手动替换 DSH 管理的 workspace 链接（junction/symlink），
 > 否则后端装配会卡住。如果插件包在 DSH 仓库里（workspace 包），用上面的
 > patch 方式启用即可；独立拷贝的包直接放进 node_modules 也行。
