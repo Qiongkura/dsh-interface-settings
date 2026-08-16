@@ -4,12 +4,14 @@
  */
 
 export interface InterfaceSettings {
-  /** 壁纸图片/视频路径（blob: URL 或 data: URL） */
+  /** 壁纸图片路径（data: URL） */
   wallpaper: string | null
   /** 壁纸模糊 px */
   wallpaperBlur: number
   /** 代码块透明度 0.08-1 */
   codeAlpha: number
+  /** 侧栏独立壁纸（共用主图时为 null） */
+  sidebarWallpaper: string | null
   /** 区域透明开关 */
   transparent: {
     newSession: boolean
@@ -23,7 +25,7 @@ export interface InterfaceSettings {
   panelAlpha: number
   /** 启动画面模式：default / follow / custom */
   splashMode: 'default' | 'follow' | 'custom'
-  /** 自定义启动素材（图片或视频） */
+  /** 自定义启动素材（图片） */
   splashFile: string | null
   /** 启动画面最小展示秒数 */
   splashDuration: number
@@ -37,6 +39,7 @@ export const DEFAULT_SETTINGS: InterfaceSettings = {
   wallpaper: null,
   wallpaperBlur: 18,
   codeAlpha: 0.45,
+  sidebarWallpaper: null,
   transparent: { newSession: true, input: true, sidebar: true, main: true },
   glassBlur: 10,
   panelAlpha: 0.55,

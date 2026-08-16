@@ -20,13 +20,15 @@
 
 | 功能 | 说明 |
 | --- | --- |
-| 壁纸 | 图片/视频壁纸（`body::before` 伪元素层，负 z-index 不拦截输入） |
-| 壁纸模糊 | 独立滑块（0-100px） |
-| 输入框液态玻璃 | `composerSeat::before` + `backdrop-filter`，独立模糊滑块（最低 10px 保证文字必糊） |
+| 壁纸 | 图片壁纸（`body::before` 伪元素层，负 z-index 不拦截输入） |
+| 侧栏壁纸 | 与主界面共用 / 单独设置独立图片 |
+| 壁纸模糊 | 独立滑块（0-64px） |
+| 输入框液态玻璃 | `composerSeat::before` + `backdrop-filter`，独立模糊滑块（0-64px） |
 | 轨迹毛玻璃 | 与输入框共用滑块；按颜色饱和度智能透明（保留时间线色条/状态标签） |
 | 面板透明度 | 滑块（0-90%） |
+| 代码块透明度 | 滑块（8-100%），含代码块标题栏与行内代码 |
 | 区域透明开关 | 新对话 / 输入框 / 左边栏 / 主界面 |
-| 启动画面 | 默认 / 跟随主题 / 自定义（图片或视频）；最小展示时长、淡出、点击跳过 |
+| 启动画面 | 默认 / 跟随主题 / 自定义（图片）；最小展示时长、淡出、点击跳过 |
 
 ## 开发过程
 
@@ -211,11 +213,12 @@ saveSettings(next)
 
 | 配置项 | 说明 | 默认 |
 | --- | --- | --- |
-| `wallpaper` | 壁纸图片/视频（data/blob URL） | null |
+| `wallpaper` | 壁纸图片（data URL） | null |
 | `wallpaperBlur` | 壁纸模糊 px | 18 |
+| `sidebarWallpaper` | 侧栏独立壁纸（null = 共用主图） | null |
 | `codeAlpha` | 代码块透明度 | 0.45 |
 | `transparent.*` | 新对话/输入框/侧栏/主界面 透明开关 | true |
-| `glassBlur` | 输入框/轨迹玻璃模糊 px（最低 10） | 10 |
+| `glassBlur` | 输入框/轨迹玻璃模糊 px（0-64） | 10 |
 | `panelAlpha` | 面板透明度 | 0.55 |
 | `splashMode` | 启动画面 default/follow/custom | default |
 | `splashFile` | 自定义启动素材 | null |
@@ -246,6 +249,7 @@ pnpm --filter dsh-interface-settings test
 ## 📮 联系方式
 
 - GitHub：https://github.com/Qiongkura
+- 微信：Qiongkura
 
 ## 已知限制
 

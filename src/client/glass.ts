@@ -1,5 +1,8 @@
 /**
- * 液态玻璃与区域透明。
+ * 液态玻璃、区域透明与代码块透明度 —— 与桌面端 applyVars 同源逻辑。
+ *
+ * 所有变量必须设在 document.body 上：值里引用 var(--dsw-alias-*) 等主题变量，
+ * 主题变量定义在 body，设在 html 上会解析失败导致开关失效。
  *
  * 输入框玻璃：composerSeat::before + backdrop-filter + 面板色渐变（最低 10px 保证文字必糊）。
  * 轨迹玻璃：按颜色饱和度智能透明——中性色（白/灰）背景透明让壁纸透出，
@@ -8,15 +11,58 @@
 import type { InterfaceSettings } from './settings.ts'
 
 export function applyGlassAndTransparency(settings: InterfaceSettings): void {
-  const t = settings.transparent
-  document.body.style.setProperty('--dsh-glass-blur', `${Math.max(10, settings.glassBlur)}px`)
-  document.body.style.setProperty('--dsh-t-new-session', t.newSession ? 'transparent' : '')
-  document.body.style.setProperty('--dsh-t-input', t.input ? 'transparent' : '')
-  document.body.style.setProperty('--dsh-t-sidebar', t.sidebar ? 'transparent' : '')
-  document.body.style.setProperty('--dsh-t-main', t.main ? 'transparent' : '')
-
+  applyVars(settings)
   injectGlassCss()
   startTrajectoryTransparentizer()
+}
+
+/** 重新应用全部透明/颜色变量（设置面板保存后调用，可重复执行）。 */
+export function applyVars(settings: InterfaceSettings): void {
+  const isDark =
+    document.body.hasAttribute('data-ds-dark-theme') ||
+    (getComputedStyle(document.documentElement).colorScheme || 'light') === 'dark'
+  const T = settings.transparent
+
+  const alphaRaw = settings.codeAlpha
+  const alpha = Number.isFinite(alphaRaw) ? Math.max(0.08, Math.min(1, alphaRaw)) : 0.45
+  const paRaw = settings.panelAlpha
+  const pa = Number.isFinite(paRaw) ? Math.max(0, Math.min(1, paRaw)) : 0.55
+  const panelColor = isDark ? `rgba(12,15,22,${pa})` : `rgba(255,255,255,${pa})`
+
+  // 壁纸模糊与面板半透明强度
+  document.body.style.setProperty('--dsh-wallpaper-blur', `${settings.wallpaperBlur}px`)
+  document.body.style.setProperty('--dsh-wallpaper-panel-alpha', `${pa}`)
+  document.body.style.setProperty('--dsh-wallpaper-code-alpha', `${alpha}`)
+  // 输入框液态玻璃专用模糊（独立滑杆控制，0-64 与桌面端一致）
+  document.body.style.setProperty('--dsh-glass-blur', `${Math.max(0, Math.min(64, settings.glassBlur))}px`)
+
+  // 主界面面板：透明=半透明面板色；不透明=主题基底色
+  document.body.style.setProperty('--dsh-wallpaper-panel', T.main ? panelColor : 'var(--dsw-alias-bg-base)')
+  // 侧栏面板：独立开关
+  document.body.style.setProperty(
+    '--dsh-wallpaper-panel-sidebar',
+    T.sidebar ? panelColor : isDark ? 'var(--dsw-static-neutral-bluish-900)' : 'var(--dsw-static-neutral-bluish-50)',
+  )
+  // 面板前景（标题栏文字/边框/悬停）：跟随外观明暗，与面板色同源
+  document.documentElement.style.setProperty('--dsh-wallpaper-panel-fg', isDark ? 'rgba(249,250,251,0.92)' : 'rgba(15,17,21,0.92)')
+  document.documentElement.style.setProperty('--dsh-wallpaper-panel-border', isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')
+  document.documentElement.style.setProperty('--dsh-wallpaper-panel-hover', isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.06)')
+  // 输入框卡片（含"新会话"英雄卡片）
+  document.body.style.setProperty(
+    '--dsw-specific-input-major',
+    T.input ? 'transparent' : isDark ? 'var(--dsw-static-neutral-bluish-850)' : 'var(--dsw-static-neutral-bluish-00)',
+  )
+  // 侧栏"新对话"按钮
+  document.body.style.setProperty('--dsh-t-new-session', T.newSession ? 'transparent' : 'var(--dsw-alias-button-elevated-fill)')
+  // 侧栏滚动渐隐终点色：保持透明（让背景透出），不随开关恢复
+  document.body.style.setProperty('--dsw-specific-sidebar-fill', 'transparent')
+  // 代码块/行内代码透明度
+  document.body.style.setProperty('--dsw-alias-markdown-code-block', isDark ? `rgba(12,15,22,${alpha})` : `rgba(255,255,255,${alpha})`)
+  document.body.style.setProperty(
+    '--dsw-alias-markdown-code-block-banner',
+    isDark ? `rgba(20,24,34,${alpha})` : `rgba(250,251,252,${alpha})`,
+  )
+  document.body.style.setProperty('--dsw-alias-markdown-inline-code', isDark ? `rgba(35,38,43,${alpha})` : `rgba(239,240,243,${alpha})`)
 }
 
 let glassInjected = false

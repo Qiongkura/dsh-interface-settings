@@ -1,65 +1,200 @@
+/**
+ * 界面设置面板样式 —— 对齐桌面端「界面设置」对话框外观。
+ * 颜色通过 CSS 变量定义，跟随应用明暗主题（body[data-ds-dark-theme]）。
+ */
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  font: 13px/1.5 system-ui, sans-serif;
+  padding: 18px 20px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  --label-primary: #0f1115;
+  --label-secondary: #61666b;
+  --border-l2: rgba(15, 17, 21, 0.14);
+  --hover-bg: rgba(15, 17, 21, 0.06);
+  --btn-primary-bg: #0f1115;
+  --btn-primary-fg: #f9fafb;
+  --btn-primary-hover: #2a2e37;
+  color: var(--label-primary);
 }
 
-.panel h3 {
-  margin: 0 0 4px;
-  font-size: 14px;
+body[data-ds-dark-theme] .panel {
+  --label-primary: #f9fafb;
+  --label-secondary: #81858c;
+  --border-l2: rgba(255, 255, 255, 0.12);
+  --hover-bg: rgba(255, 255, 255, 0.08);
+  --btn-primary-bg: #f9fafb;
+  --btn-primary-fg: #0f1115;
+  --btn-primary-hover: #ebecf2;
 }
 
-.row {
+.row,
+.imgrow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
 }
 
-.row input[type='range'] {
+.imgrow {
+  gap: 8px;
+}
+
+.row .label,
+.imgrow .label {
+  width: 92px;
+  font-size: 12px;
+  color: var(--label-secondary);
+  flex: none;
+}
+
+.imgname {
   flex: 1;
-  min-width: 120px;
+  font-size: 12px;
+  color: var(--label-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.panel input[type='range'] {
+  flex: 1;
+  accent-color: #4d6bfe;
+  min-width: 0;
+}
+
+.val {
+  min-width: 52px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--label-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.smallbtn {
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  border: 1px solid var(--border-l2);
+  background: transparent;
+  color: var(--label-primary);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  flex: none;
+}
+
+.smallbtn:hover {
+  background: var(--hover-bg);
+}
+
+.seg {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.segbtn {
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 13px;
+  border: 1px solid var(--border-l2);
+  background: transparent;
+  color: var(--label-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segbtn.on {
+  background: rgba(77, 107, 254, 0.18);
+  border-color: #4d6bfe;
+  color: #4d6bfe;
+}
+
+.segbtn:hover {
+  background: var(--hover-bg);
+}
+
+.segbtn.on:hover {
+  background: rgba(77, 107, 254, 0.26);
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  flex: 1;
+  min-width: 0;
 }
 
 .check {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  font-size: 12px;
+  color: var(--label-secondary);
+  cursor: pointer;
   white-space: nowrap;
 }
 
-.row button {
-  padding: 2px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(128, 128, 128, 0.4);
+.check input {
+  accent-color: #4d6bfe;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.desc {
+  margin-top: 6px;
+  padding-left: 104px;
+  font-size: 12px;
+  color: var(--label-secondary);
+}
+
+.footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
   background: transparent;
+  color: var(--label-primary);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
 }
 
-.name {
-  font-size: 11px;
-  color: rgba(128, 128, 128, 0.8);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 160px;
+.btnGhost {
+  border-color: var(--border-l2);
 }
 
-.row button.on {
-  border-color: #4d6bfe;
-  color: #4d6bfe;
-  background: rgba(77, 107, 254, 0.12);
+.btnGhost:hover {
+  background: var(--hover-bg);
 }
 
-.save {
-  align-self: flex-end;
-  padding: 5px 18px;
-  border-radius: 14px;
-  border: 0;
-  background: #0f1115;
-  color: #fff;
+.btnPrimary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
   font-weight: 600;
-  cursor: pointer;
+}
+
+.btnPrimary:hover {
+  background: var(--btn-primary-hover);
 }
