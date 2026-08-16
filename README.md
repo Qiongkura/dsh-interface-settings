@@ -152,7 +152,30 @@ DSH 仓库 checkout（deepseek-ai/deepseek-harness）
 
 ## 安装与使用
 
-本插件需在 DSH 仓库（monorepo）内构建（peer 依赖为 workspace 包）：
+### 用户安装（拿到即用，已验证）
+
+插件以打包产物分发（GitHub Release 附 `dsh-interface-settings-0.1.0.tgz`），
+不需要 DSH 源码：
+
+```bash
+# 1) 下载 tarball 后安装到 DSH 的 profile 目录：
+#    解压到 ~/.dsh/profiles/node_modules/dsh-interface-settings/（含 lib/client.js）
+#    （或：cd ~/.dsh/profiles && pnpm add <tarball 路径>）
+
+# 2) 在 ~/.dsh/profiles/web/cordis.patch.yml 追加：
+#    - insert:
+#        - id: dsh-interface-settings
+#          name: 'dsh-interface-settings'
+
+# 3) 重启 dsh web（或重启桌面端应用）
+```
+
+重启后打开「设置 → 界面设置」即可调整外观。此路径已实测：
+插件进入 manifest 且 bundle 正常服务（HTTP 200）。
+
+### 开发者（在 DSH 仓库内构建）
+
+本插件是 DSH monorepo 的 workspace 插件（peer 依赖为 workspace 包）：
 
 ```bash
 # 1) 把本项目放入 packages/client/interface-settings（或作为 workspace 包引入）
@@ -163,7 +186,7 @@ pnpm --filter dsh-interface-settings bundle
 
 启用后：
 
-- 打开「设置 → 界面设置」面板调整壁纸模糊 / 玻璃模糊 / 面板透明度 /
+- 打开「设置 → 界面设置」面板调整壁纸 / 壁纸模糊 / 玻璃模糊 / 面板透明度 /
   区域透明 / 启动画面；
 - 所有改动即时预览，保存后持久化（localStorage）。
 
