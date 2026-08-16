@@ -152,23 +152,25 @@ DSH 仓库 checkout（deepseek-ai/deepseek-harness）
 
 ## 安装与使用
 
-### 用户安装（拿到即用，已验证）
+### 用户安装（无需 npm/pnpm，已验证）
 
-插件以打包产物分发（GitHub Release 附 `dsh-interface-settings-0.1.0.tgz`），
-不需要 DSH 源码：
+像用量统计插件一样，把插件**拷贝**到 DSH 的 profile 目录即可（不需要 npm）：
 
 ```bash
-# 1) 下载 tarball 后安装到 DSH 的 profile 目录：
-#    解压到 ~/.dsh/profiles/node_modules/dsh-interface-settings/（含 lib/client.js）
-#    （或：cd ~/.dsh/profiles && pnpm add <tarball 路径>）
+# 1) 把整个插件目录（含 lib/client.js、lib/index.js、package.json）拷贝到：
+#    ~/.dsh/profiles/node_modules/dsh-interface-settings/
 
 # 2) 在 ~/.dsh/profiles/web/cordis.patch.yml 追加：
 #    - insert:
 #        - id: dsh-interface-settings
 #          name: 'dsh-interface-settings'
 
-# 3) 重启 dsh web（或重启桌面端应用）
+# 3) 重启 dsh web（或重启桌面端应用；改 patch 也会热重载）
 ```
+
+> ⚠️ 注意：**不要**手动替换 DSH 管理的 workspace 链接（junction/symlink），
+> 否则后端装配会卡住。如果插件包在 DSH 仓库里（workspace 包），用上面的
+> patch 方式启用即可；独立拷贝的包直接放进 node_modules 也行。
 
 重启后打开「设置 → 界面设置」即可调整外观。此路径已实测：
 插件进入 manifest 且 bundle 正常服务（HTTP 200）。
