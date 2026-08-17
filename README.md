@@ -16,6 +16,10 @@
 - **一个设置面板**：壁纸模糊、玻璃模糊、面板透明度、区域透明开关、启动画面模式；
 - **与桌面端同一套技术方案**：本插件是桌面端（[dsh-desktop](https://github.com/Qiongkura/dsh-desktop)）界面定制能力的浏览器端移植。
 
+<div align="center">
+<img src="docs/interface-settings.png" alt="界面设置面板" width="600" />
+</div>
+
 ## 功能
 
 | 功能 | 说明 |
