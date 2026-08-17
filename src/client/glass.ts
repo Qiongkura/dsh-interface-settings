@@ -35,6 +35,10 @@ export function applyVars(settings: InterfaceSettings): void {
   document.body.style.setProperty('--dsh-wallpaper-code-alpha', `${alpha}`)
   // 输入框液态玻璃专用模糊（独立滑杆控制，0-64 与桌面端一致）
   document.body.style.setProperty('--dsh-glass-blur', `${Math.max(0, Math.min(64, settings.glassBlur))}px`)
+  // 工具调用行文字颜色（0%=白色 100%=黑色，中间灰）
+  const tgRaw = settings.toolGray
+  const tg = Number.isFinite(tgRaw) ? Math.max(0, Math.min(100, tgRaw)) : 50
+  document.body.style.setProperty('--dsh-tool-gray', `${tg}%`)
 
   // 主界面面板：透明=半透明面板色；不透明=主题基底色
   document.body.style.setProperty('--dsh-wallpaper-panel', T.main ? panelColor : 'var(--dsw-alias-bg-base)')
@@ -98,6 +102,16 @@ function injectGlassCss(): void {
     /* 侧栏新对话按钮透明开关 */
     #root [class*='newSession'] {
       background: var(--dsh-t-new-session, transparent) !important;
+    }
+    /* 文字颜色跟随滑杆：覆盖工具行/思考/产物；error态保留红色 */
+    #root [data-tool] *,
+    #root [data-variant="think"] *,
+    #root [data-produced-files-row] * {
+      color: hsl(0, 0%, calc(100% - var(--dsh-tool-gray, 50%))) !important;
+    }
+    #root [data-tool][data-state="error"] *,
+    #root [data-variant][data-state="error"] * {
+      color: var(--dsw-alias-state-error-primary, #e53935) !important;
     }
     /* 轨迹视图液态玻璃（根元素 + 面板色 22% 低透明） */
     #root [data-conversation-composer-overlay] {

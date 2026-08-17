@@ -265,6 +265,14 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       <div className={css.desc}>{t('codeAlphaDesc')}</div>
 
       <div className={css.row}>
+        <span className={css.label}>{t('toolGray')}</span>
+        <input type="range" min={0} max={100} step={1} value={settings.toolGray}
+          onChange={e => update({ toolGray: Number(e.target.value) })} />
+        <span className={css.val}>{settings.toolGray}%</span>
+      </div>
+      <div className={css.desc}>{t('toolGrayDesc')}</div>
+
+      <div className={css.row}>
         <span className={css.label}>{t('transparent')}</span>
         <div className={css.checks}>
           {(['newSession', 'input', 'sidebar', 'main'] as const).map(key => (

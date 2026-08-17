@@ -53,6 +53,8 @@ export interface InterfaceSettings {
   glassBlur: number
   /** 面板透明度 0-1 */
   panelAlpha: number
+  /** 工具调用行渐变 0-100（0=全黑，50=半白半黑，100=全白） */
+  toolGray: number
   /** 启动画面模式：default / follow / custom */
   splashMode: 'default' | 'follow' | 'custom'
   /** 自定义启动素材（图片） */
@@ -77,6 +79,7 @@ export const DEFAULT_SETTINGS: InterfaceSettings = {
   transparent: { newSession: true, input: true, sidebar: true, main: true },
   glassBlur: 10,
   panelAlpha: 0.55,
+  toolGray: 50,
   splashMode: 'default',
   splashFile: null,
   splashDuration: 0,
