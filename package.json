@@ -1,7 +1,7 @@
 {
   "name": "dsh-interface-settings",
   "description": "DSH interface customization plugin: wallpaper, panel/input transparency, blur strength, splash screen",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",

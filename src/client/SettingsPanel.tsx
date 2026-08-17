@@ -5,9 +5,11 @@
  * 输入框玻璃、面板透明度、代码块透明度、区域透明开关、启动画面
  * （模式/素材/时长/淡出）。改动即时预览，确定后持久化。
  */
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { type InterfaceSettingsKey } from './locales.ts'
-import { DEFAULT_SETTINGS, loadSettings, saveSettings, type InterfaceSettings } from './settings.ts'
+import {
+  DEFAULT_SETTINGS, hasDesktopBridge, loadSettings, previewSettings, saveSettings, type InterfaceSettings,
+} from './settings.ts'
 import { applyWallpaperLayer } from './wallpaper.ts'
 import { applyGlassAndTransparency } from './glass.ts'
 import { applySplashLayer } from './splash.ts'
@@ -28,15 +30,44 @@ export type SettingsPanelProps = SettingsPanelInjected & {
 /** 浏览器端选择的文件只保留展示名（内容以 data URL 持久化）。 */
 interface PickedNames {
   main: string | null
+  video: string | null
   sidebar: string | null
   splash: string | null
 }
 
 export function SettingsPanel({ t, close }: SettingsPanelProps) {
   const [settings, setSettings] = useState<InterfaceSettings>(() => loadSettings())
-  const [names, setNames] = useState<PickedNames>({ main: null, sidebar: null, splash: null })
+  const [names, setNames] = useState<PickedNames>({ main: null, video: null, sidebar: null, splash: null })
+  // 启动画面视频时长上限（秒）；无视频素材时为 null（滑块保持默认 10 秒上限）
+  const [durationMax, setDurationMax] = useState<number | null>(null)
+
+  // 启动素材/模式变化时向主进程查询视频完整时长，动画时长滑块上限自动扩容
+  useEffect(() => {
+    if (!hasDesktopBridge()) {
+      setDurationMax(null)
+      return
+    }
+    let cancelled = false
+    window.dshInterfaceSettings!.splashDurationMax()
+      .then((max) => { if (!cancelled) setDurationMax(max) })
+      .catch(() => { if (!cancelled) setDurationMax(null) })
+    return () => { cancelled = true }
+  }, [settings.splashFile, settings.videoWallpaper, settings.splashMode])
+
+  // 素材切换后若当前时长超过新上限，自动钳制
+  useEffect(() => {
+    if (durationMax !== null && settings.splashDuration > durationMax) {
+      update({ splashDuration: durationMax })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [durationMax])
 
   const applyAll = useCallback((s: InterfaceSettings) => {
+    if (hasDesktopBridge()) {
+      // 桌面端：由主进程应用（含视频壁纸/视频声音），插件不做 DOM 注入
+      previewSettings(s)
+      return
+    }
     applyWallpaperLayer(s)
     applyGlassAndTransparency(s)
     if (s.splashMode !== 'default') applySplashLayer(s)
@@ -46,8 +77,12 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
     setSettings((prev) => {
       const next = { ...prev, ...patch }
       // 即时预览（启动画面在确定时应用，避免拖动过程叠层）
-      applyWallpaperLayer(next)
-      applyGlassAndTransparency(next)
+      if (hasDesktopBridge()) {
+        previewSettings(next)
+      } else {
+        applyWallpaperLayer(next)
+        applyGlassAndTransparency(next)
+      }
       return next
     })
   }, [])
@@ -56,17 +91,27 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
     update({ transparent: { ...settings.transparent, [key]: checked } })
   }
 
-  /** 选择本地图片（转 data URL 持久化，浏览器端安全限制内）。 */
-  const pickFile = (accept: string, onData: (dataUrl: string) => void, onName: (name: string) => void) => {
+  /** 选择本地素材：桌面端走主进程原生对话框（返回文件路径，支持视频）；
+   *  纯 web 用 FileReader 转 data URL 持久化。 */
+  const pickFile = async (
+    kind: 'wallpaper' | 'wallpaper-video' | 'sidebar' | 'splash',
+    accept: string,
+    onPick: (payload: { value: string | null; name: string; isVideo: boolean }) => void,
+  ) => {
+    if (hasDesktopBridge()) {
+      const picked = await window.dshInterfaceSettings!.pick(kind).catch(() => null)
+      if (picked === null) return
+      onPick({ value: picked.file, name: picked.name, isVideo: picked.isVideo })
+      return
+    }
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = accept
     input.onchange = () => {
       const file = input.files?.[0]
       if (!file) return
-      onName(file.name)
       const reader = new FileReader()
-      reader.onload = () => onData(String(reader.result))
+      reader.onload = () => onPick({ value: String(reader.result), name: file.name, isVideo: false })
       reader.readAsDataURL(file)
     }
     input.click()
@@ -74,20 +119,23 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
 
   const ok = () => {
     saveSettings(settings)
-    applyAll(settings)
+    if (!hasDesktopBridge()) applyAll(settings)
     close()
   }
 
   const cancel = () => {
     // 丢弃草稿：恢复已保存的设置（撤销预览）
-    applyAll(loadSettings())
+    const saved = loadSettings()
+    if (hasDesktopBridge()) previewSettings(saved)
+    else applyAll(saved)
     close()
   }
 
   const reset = () => {
-    setNames({ main: null, sidebar: null, splash: null })
+    setNames({ main: null, video: null, sidebar: null, splash: null })
     setSettings(DEFAULT_SETTINGS)
-    applyAll(DEFAULT_SETTINGS)
+    if (hasDesktopBridge()) previewSettings(DEFAULT_SETTINGS)
+    else applyAll(DEFAULT_SETTINGS)
   }
 
   const cls = (on: boolean): string => (on ? `${css.segbtn ?? ''} ${css.on ?? ''}` : css.segbtn ?? '')
@@ -98,19 +146,55 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
         <span className={css.label}>{t('mainImage')}</span>
         <span className={css.imgname}>{names.main ?? (settings.wallpaper === null ? t('none') : t('set'))}</span>
         <button className={css.smallbtn} onClick={() => pickFile(
+          'wallpaper',
           'image/*',
-          d => update({ wallpaper: d }),
-          n => setNames(p => ({ ...p, main: n })),
+          ({ value, name, isVideo }) => {
+            setNames(p => ({ ...p, main: isVideo ? null : name }))
+            if (isVideo) update({ videoWallpaper: value, wallpaper: null })
+            else update({ wallpaper: value, videoWallpaper: null })
+          },
         )}>
           {t('choose')}
         </button>
         <button className={css.smallbtn} onClick={() => {
           setNames(p => ({ ...p, main: null }))
-          update({ wallpaper: null })
+          update({ wallpaper: null, videoWallpaper: null })
         }}>
           {t('clear')}
         </button>
       </div>
+
+      {hasDesktopBridge() && (
+        <>
+          <div className={css.imgrow}>
+            <span className={css.label}>{t('videoWallpaper')}</span>
+            <span className={css.imgname}>{names.video ?? (settings.videoWallpaper === null ? t('none') : t('set'))}</span>
+            <button className={css.smallbtn} onClick={() => pickFile(
+              'wallpaper-video',
+              'video/*',
+              ({ value, name }) => {
+                setNames(p => ({ ...p, video: name }))
+                update({ videoWallpaper: value, wallpaper: null })
+              },
+            )}>
+              {t('choose')}
+            </button>
+            <button className={css.smallbtn} onClick={() => {
+              setNames(p => ({ ...p, video: null }))
+              update({ videoWallpaper: null })
+            }}>
+              {t('clear')}
+            </button>
+          </div>
+          <div className={css.row}>
+            <label className={css.check}>
+              <input type="checkbox" checked={settings.videoSound}
+                onChange={e => update({ videoSound: e.target.checked })} />
+              <span>{t('videoSound')}</span>
+            </label>
+          </div>
+        </>
+      )}
 
       <div className={css.row}>
         <span className={css.label}>{t('sidebarMode')}</span>
@@ -130,9 +214,12 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
           <span className={css.label}>{t('sidebarImage')}</span>
           <span className={css.imgname}>{names.sidebar ?? t('set')}</span>
           <button className={css.smallbtn} onClick={() => pickFile(
+            'sidebar',
             'image/*',
-            d => update({ sidebarWallpaper: d }),
-            n => setNames(p => ({ ...p, sidebar: n })),
+            ({ value, name }) => {
+              setNames(p => ({ ...p, sidebar: name }))
+              update({ sidebarWallpaper: value })
+            },
           )}>
             {t('choose')}
           </button>
@@ -207,9 +294,12 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
           <span className={css.label}>{t('splashPick')}</span>
           <span className={css.imgname}>{names.splash ?? (settings.splashFile === null ? t('none') : t('set'))}</span>
           <button className={css.smallbtn} onClick={() => pickFile(
+            'splash',
             'image/*',
-            d => update({ splashFile: d }),
-            n => setNames(p => ({ ...p, splash: n })),
+            ({ value, name }) => {
+              setNames(p => ({ ...p, splash: name }))
+              update({ splashFile: value })
+            },
           )}>
             {t('pick')}
           </button>
@@ -224,10 +314,13 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
 
       <div className={css.row}>
         <span className={css.label}>{t('duration')}</span>
-        <input type="range" min={0} max={10} step={0.5} value={settings.splashDuration}
+        <input type="range" min={0} max={durationMax ?? 10} step={0.5} value={Math.min(settings.splashDuration, durationMax ?? 10)}
           onChange={e => update({ splashDuration: Number(e.target.value) })} />
         <span className={css.val}>{settings.splashDuration === 0 ? t('durationZero') : `${settings.splashDuration} 秒`}</span>
       </div>
+      {durationMax !== null && (
+        <div className={css.desc}>{t('durationMaxDesc', { seconds: durationMax })}</div>
+      )}
       <div className={css.desc}>{t('durationDesc')}</div>
 
       <div className={css.row}>

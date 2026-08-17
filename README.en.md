@@ -18,7 +18,18 @@ A **DeepSeek Harness front-end plugin** that brings wallpaper, area transparency
 | Panel opacity | Slider (0-90%) |
 | Code block opacity | Slider (8-100%), including banner and inline code |
 | Transparent areas | New session / Composer / Sidebar / Main toggles |
-| Splash screen | Default / Follow theme / Custom (image); min duration, fade, click to skip |
+| Splash screen | Default / Follow theme / Custom (image or video); min duration, fade, click to skip |
+
+## Desktop bridge (dsh-desktop 0.2.0)
+
+When running inside the [dsh-desktop](https://github.com/Qiongkura/dsh-desktop) shell, the plugin
+automatically uses the desktop bridge (`window.dshInterfaceSettings`, injected by the desktop preload):
+
+- The panel shares the same Electron config with the main process, which applies everything
+  (including desktop-only capabilities such as video wallpaper / video sound);
+- File picking uses native dialogs (videos supported; HEVC auto-transcoded);
+- For a video splash asset the duration slider upper limit is set to the full video duration;
+- In a plain web environment it falls back to plugin-managed localStorage + DOM injection, unchanged.
 
 ## Install (no npm required, verified)
 

@@ -21,6 +21,8 @@
 | 功能 | 说明 |
 | --- | --- |
 | 壁纸 | 图片壁纸（`body::before` 伪元素层，负 z-index 不拦截输入） |
+| 视频壁纸 | 桌面端独有：主进程经 `dsh-wallpaper://` 协议流式播放（HEVC 自动转 H.264） |
+| 视频声音 | 可选播放壁纸视频的声音 |
 | 侧栏壁纸 | 与主界面共用 / 单独设置独立图片 |
 | 壁纸模糊 | 独立滑块（0-64px） |
 | 输入框液态玻璃 | `composerSeat::before` + `backdrop-filter`，独立模糊滑块（0-64px） |
@@ -28,7 +30,17 @@
 | 面板透明度 | 滑块（0-90%） |
 | 代码块透明度 | 滑块（8-100%），含代码块标题栏与行内代码 |
 | 区域透明开关 | 新对话 / 输入框 / 左边栏 / 主界面 |
-| 启动画面 | 默认 / 跟随主题 / 自定义（图片）；最小展示时长、淡出、点击跳过 |
+| 启动画面 | 默认 / 跟随主题 / 自定义（图片或视频）；最小展示时长、淡出、点击跳过 |
+
+## 桌面端桥接（dsh-desktop 0.2.0）
+
+在 [dsh-desktop](https://github.com/Qiongkura/dsh-desktop) 壳内运行时，插件自动启用桌面端桥
+（`window.dshInterfaceSettings`，由桌面 preload 注入）：
+
+- 设置面板与主进程共用同一份 Electron 配置，由主进程应用（含视频壁纸/视频声音等桌面独有能力）；
+- 文件选择走原生对话框（支持视频；HEVC 自动转码）；
+- 启动素材为视频时，动画时长滑块上限自动 = 视频完整时长；
+- 纯 web 环境自动回退为插件自管（localStorage + DOM 注入），功能不变。
 
 ## 开发过程
 
@@ -171,7 +183,7 @@ DSH 仓库 checkout（deepseek-ai/deepseek-harness）
 ```
 
 > 也可直接下载 [Release 包](https://github.com/Qiongkura/dsh-interface-settings/releases/latest)
-> （`dsh-interface-settings-0.1.0.tgz`），解压后按上面 1) 拷贝
+> （`dsh-interface-settings-0.2.0.tgz`），解压后按上面 1) 拷贝
 > `package/` 目录内容即可，同样无需 npm。
 
 > ⚠️ 注意：**不要**手动替换 DSH 管理的 workspace 链接（junction/symlink），
@@ -217,7 +229,9 @@ saveSettings(next)
 
 | 配置项 | 说明 | 默认 |
 | --- | --- | --- |
-| `wallpaper` | 壁纸图片（data URL） | null |
+| `wallpaper` | 壁纸图片（纯 web：data URL；桌面端：路径） | null |
+| `videoWallpaper` | 视频壁纸路径（桌面端独有） | null |
+| `videoSound` | 视频壁纸声音 | false |
 | `wallpaperBlur` | 壁纸模糊 px | 18 |
 | `sidebarWallpaper` | 侧栏独立壁纸（null = 共用主图） | null |
 | `codeAlpha` | 代码块透明度 | 0.45 |

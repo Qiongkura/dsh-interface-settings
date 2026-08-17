@@ -7,6 +7,8 @@ export const NS = 'interface-settings'
 const zh = {
   title: '界面设置',
   mainImage: '壁纸图片',
+  videoWallpaper: '视频壁纸',
+  videoSound: '视频声音',
   sidebarMode: '侧栏壁纸',
   sidebarShared: '与主界面共用',
   sidebarSep: '单独设置',
@@ -37,6 +39,7 @@ const zh = {
   splashPick: '启动素材',
   duration: '动画时长',
   durationZero: '0 秒（不等待）',
+  durationMaxDesc: '启动素材为视频：上限自动设为视频完整时长（{seconds} 秒）。',
   durationDesc: '启动画面至少展示的秒数；0 = 不强制，加载完成即进入主界面（仅默认外的模式生效）。',
   fade: '淡出时长',
   fadeZero: '0 秒（直接切换）',
@@ -49,6 +52,8 @@ const zh = {
 const en: Record<keyof typeof zh, string> = {
   title: 'Interface Settings',
   mainImage: 'Wallpaper',
+  videoWallpaper: 'Video wallpaper',
+  videoSound: 'Video sound',
   sidebarMode: 'Sidebar wallpaper',
   sidebarShared: 'Share main',
   sidebarSep: 'Separate',
@@ -79,6 +84,7 @@ const en: Record<keyof typeof zh, string> = {
   splashPick: 'Splash asset',
   duration: 'Duration',
   durationZero: '0s (no wait)',
+  durationMaxDesc: 'Video splash asset: the upper limit is set to the full video duration ({seconds}s).',
   durationDesc: 'Minimum splash display time; 0 = enter immediately when ready (only applies outside Default).',
   fade: 'Fade out',
   fadeZero: '0s (switch instantly)',

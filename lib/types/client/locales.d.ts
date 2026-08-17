@@ -5,6 +5,8 @@ export declare const NS = "interface-settings";
 declare const zh: {
     readonly title: "界面设置";
     readonly mainImage: "壁纸图片";
+    readonly videoWallpaper: "视频壁纸";
+    readonly videoSound: "视频声音";
     readonly sidebarMode: "侧栏壁纸";
     readonly sidebarShared: "与主界面共用";
     readonly sidebarSep: "单独设置";
@@ -35,6 +37,7 @@ declare const zh: {
     readonly splashPick: "启动素材";
     readonly duration: "动画时长";
     readonly durationZero: "0 秒（不等待）";
+    readonly durationMaxDesc: "启动素材为视频：上限自动设为视频完整时长（{seconds} 秒）。";
     readonly durationDesc: "启动画面至少展示的秒数；0 = 不强制，加载完成即进入主界面（仅默认外的模式生效）。";
     readonly fade: "淡出时长";
     readonly fadeZero: "0 秒（直接切换）";

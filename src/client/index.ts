@@ -13,7 +13,7 @@ import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import { SettingsPanel, type SettingsPanelInjected } from './SettingsPanel.tsx'
-import { loadSettings, type InterfaceSettings } from './settings.ts'
+import { hasDesktopBridge, loadSettings, type InterfaceSettings } from './settings.ts'
 import { applyWallpaperLayer } from './wallpaper.ts'
 import { applyGlassAndTransparency } from './glass.ts'
 import { applySplashLayer } from './splash.ts'
@@ -40,11 +40,15 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'interface-settings: dictionaries')
   const t = ctx.locale.bind(NS) as SettingsPanelInjected['t']
 
-  // 1) 应用持久化的外观设置（壁纸 / 透明 / 玻璃 / 启动画面）
+  // 1) 应用持久化的外观设置（壁纸 / 透明 / 玻璃 / 启动画面）。
+  //    桌面端（dsh-desktop 壳内）：主进程启动时已应用（含视频壁纸/声音），
+  //    插件不做 DOM 注入；纯 web 环境才由插件注入。
   const settings: InterfaceSettings = loadSettings()
-  applyWallpaperLayer(settings)
-  applyGlassAndTransparency(settings)
-  if (settings.splashMode !== 'default') applySplashLayer(settings)
+  if (!hasDesktopBridge()) {
+    applyWallpaperLayer(settings)
+    applyGlassAndTransparency(settings)
+    if (settings.splashMode !== 'default') applySplashLayer(settings)
+  }
 
   // 2) 设置分区：注册到 settings.section（由 ui-settings-general 声明的
   //    sidebar.settings 子 slot），出现在设置面板的导航里
