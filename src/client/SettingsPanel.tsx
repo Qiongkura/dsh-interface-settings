@@ -48,7 +48,7 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
       return
     }
     let cancelled = false
-    window.dshInterfaceSettings!.splashDurationMax()
+    window.dshInterfaceSettings?.splashDurationMax()
       .then((max) => { if (!cancelled) setDurationMax(max) })
       .catch(() => { if (!cancelled) setDurationMax(null) })
     return () => { cancelled = true }
@@ -59,7 +59,6 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
     if (durationMax !== null && settings.splashDuration > durationMax) {
       update({ splashDuration: durationMax })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [durationMax])
 
   const applyAll = useCallback((s: InterfaceSettings) => {
@@ -99,8 +98,8 @@ export function SettingsPanel({ t, close }: SettingsPanelProps) {
     onPick: (payload: { value: string | null; name: string; isVideo: boolean }) => void,
   ) => {
     if (hasDesktopBridge()) {
-      const picked = await window.dshInterfaceSettings!.pick(kind).catch(() => null)
-      if (picked === null) return
+      const picked = await window.dshInterfaceSettings?.pick(kind).catch(() => null)
+      if (!picked) return
       onPick({ value: picked.file, name: picked.name, isVideo: picked.isVideo })
       return
     }

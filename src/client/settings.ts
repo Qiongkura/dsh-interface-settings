@@ -15,7 +15,7 @@ export interface DesktopBridge {
   commit(settings: InterfaceSettings): void
   /** 原生文件选择：wallpaper / wallpaper-video / sidebar / splash。 */
   pick(kind: 'wallpaper' | 'wallpaper-video' | 'sidebar' | 'splash'):
-    Promise<{ file: string; name: string; isVideo: boolean } | null>
+  Promise<{ file: string; name: string; isVideo: boolean } | null>
   /** 清除某项（壁纸 / 视频壁纸 / 侧栏 / 启动素材）。 */
   clear(kind: 'wallpaper' | 'wallpaper-video' | 'sidebar' | 'splash'): void
   /** 启动画面视频时长上限（秒）；当前启动素材不是视频时返回 null。 */
@@ -97,7 +97,8 @@ function merge(raw: Partial<InterfaceSettings>): InterfaceSettings {
 export function loadSettings(): InterfaceSettings {
   if (hasDesktopBridge()) {
     try {
-      return merge(window.dshInterfaceSettings!.get() as Partial<InterfaceSettings>)
+      const bridge = window.dshInterfaceSettings
+      if (bridge) return merge(bridge.get() as Partial<InterfaceSettings>)
     } catch { /* 主进程未就绪时回退 localStorage */ }
   }
   try {
@@ -111,7 +112,7 @@ export function loadSettings(): InterfaceSettings {
 
 export function saveSettings(settings: InterfaceSettings): void {
   if (hasDesktopBridge()) {
-    window.dshInterfaceSettings!.commit(settings)
+    window.dshInterfaceSettings?.commit(settings)
     return
   }
   localStorage.setItem(KEY, JSON.stringify(settings))
@@ -119,5 +120,5 @@ export function saveSettings(settings: InterfaceSettings): void {
 
 /** 预览（应用但不保存）；桌面端由主进程应用，纯 web 由调用方 DOM 应用。 */
 export function previewSettings(settings: InterfaceSettings): void {
-  if (hasDesktopBridge()) window.dshInterfaceSettings!.preview(settings)
+  if (hasDesktopBridge()) window.dshInterfaceSettings?.preview(settings)
 }
