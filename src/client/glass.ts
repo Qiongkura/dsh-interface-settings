@@ -99,6 +99,11 @@ function injectGlassCss(): void {
       backdrop-filter: blur(var(--dsh-glass-blur, 10px)) !important;
       -webkit-backdrop-filter: blur(var(--dsh-glass-blur, 10px)) !important;
     }
+    /* 新会话(hero)界面隐藏输入区毛玻璃，保持全透 */
+    #root [data-phase='hero'] [class*='composerSeat']::before,
+    #root [data-phase='hero'] [class*='composerSeat']::after {
+      display: none !important;
+    }
     /* 侧栏新对话按钮透明开关 */
     #root [class*='newSession'] {
       background: var(--dsh-t-new-session, transparent) !important;
